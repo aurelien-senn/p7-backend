@@ -4,12 +4,17 @@ const jwt = require('jsonwebtoken');
 
 //creation new user
 exports.signup = (req, res, next) => {
-    bcrypt.hash(requ.body.password, 10)
+
+    const Data = JSON.parse(req.body.data);
+    console.log(Data.email);
+    bcrypt.hash(Data.password, 10)
+
         .then(hash => {
-            const user = new user({
-                email: req.body.email,
+            const user = new User({
+                email: Data.email,
                 password: hash
             });
+            console.log(user);
             user.save()
                 .then(() => res.status(201).json({ message: 'utilisateur créé !' }))
                 .catch(error => res.status(400).json({ error }));
@@ -17,12 +22,13 @@ exports.signup = (req, res, next) => {
         .catch(error => res.status(500).json({ error }));
 };
 exports.login = (req, res, next) => {
-    User.findOne({ email: req.body.email })
+    const Data = JSON.parse(req.body.data);
+    User.findOne({ email: Data.email })
         .then(user => {
             if (!user) {
                 return res.status(401).json({ message: 'Paire login/mot de passe incorrecte' });
             }
-            bcrypt.compare(req.body.password, user.password)
+            bcrypt.compare(Data.password, user.password)
                 .then(valid => {
                     if (!valid) {
                         return res.status(401).json({ message: 'Paire login/mot de passe incorrecte' });
