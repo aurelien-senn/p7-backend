@@ -3,7 +3,7 @@ const fs = require('fs');
 
 exports.createThing = (req, res, next) => {
 
-
+    console.log(req.body);
     const thing = new Thing({
         ...req.body,
         userId: req.auth.userId,
