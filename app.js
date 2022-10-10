@@ -25,4 +25,6 @@ app.use((req, res, next) => {
 app.use(bodyParser.json());
 app.use('/api/stuff', stuffRoutes);
 app.use('/api/auth', userRoutes);
+
+app.use("/images", express.static("images")); //Le dossier où se trouve le fichier
 module.exports = app;
