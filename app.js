@@ -26,5 +26,5 @@ app.use(bodyParser.json());
 app.use('/api/stuff', stuffRoutes);
 app.use('/api/auth', userRoutes);
 
-app.use("/images", express.static("images")); //Le dossier où se trouve le fichier
+app.use("/images", express.static("images"));
 module.exports = app;

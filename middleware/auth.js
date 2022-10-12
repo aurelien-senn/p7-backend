@@ -8,10 +8,11 @@ module.exports = (req, res, next) => {
         const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
 
         const userId = decodedToken.userId;
-
+        console.log(userId);
         req.auth = {
             userId: userId
         };
+        ;
 
         next();
     } catch (error) {

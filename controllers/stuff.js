@@ -3,7 +3,7 @@ const fs = require('fs');
 
 exports.createThing = (req, res, next) => {
 
-    console.log(req.body);
+
     const thing = new Thing({
         ...req.body,
         userId: req.auth.userId,
@@ -58,10 +58,13 @@ exports.modifyThing = (req, res, next) => {
 };
 
 exports.deleteThing = (req, res, next) => {
+    console.log(req.params.id);
     Thing.findOne({ _id: req.params.id })
         .then(thing => {
+            console.log(`thing?userid` + thing.userId);
+            console.log(`authorization` + req.auth);
             if (thing.userId != req.auth.userId) {
-                res.status(401).json({ message: 'Not authorized' });
+                res.status(401).json({ message: 'Not authorized ' });
             } else {
                 const filename = thing.imageUrl.split('/images/')[1];
                 fs.unlink(`images/${filename}`, () => {
