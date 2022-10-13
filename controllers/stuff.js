@@ -58,11 +58,9 @@ exports.modifyThing = (req, res, next) => {
 };
 
 exports.deleteThing = (req, res, next) => {
-    console.log(req.params.id);
+
     Thing.findOne({ _id: req.params.id })
         .then(thing => {
-            console.log(`thing?userid` + thing.userId);
-            console.log(`authorization` + req.auth);
             if (thing.userId != req.auth.userId) {
                 res.status(401).json({ message: 'Not authorized ' });
             } else {
@@ -92,3 +90,60 @@ exports.getAllStuff = (req, res, next) => {
         }
     );
 };
+exports.likeThing = (req, res) => {
+    console.log(req.body.like);
+    if (req.body.like === 1) {
+        Thing.updateOne({ _id: req.params.id }, {
+            $inc: { likes: req.body.like++ },
+            $push: { usersLiked: req.body.userId },
+        }
+        )
+            .then((thing) => res.status(200).json({ message: "like" }))
+            .catch((error) => res.status(400).json({ error }));
+    }
+
+
+    else if (req.body.like === -1) {
+        Thing.updateOne(
+            { _id: req.params.id },
+            {
+                $inc: { dislikes: req.body.like++ * -1 },
+                $push: { usersDisliked: req.body.userId },
+            }
+        )
+            .then((thing) =>
+                res.status(200).json({ message: "dislike" })
+            )
+            .catch((error) => res.status(400).json({ error }));
+    }
+
+    else if (req.body.like === 0) {
+        Thing.findOne({ _id: req.params.id })
+            .then((thing) => {
+                if (thing.usersLiked.includes(req.body.userId)) {
+                    Thing.updateOne(
+                        { _id: req.params.id },
+                        { $pull: { usersLiked: req.body.userId }, $inc: { likes: -1 } }
+                    )
+                        .then((thing) => {
+                            res.status(200).json({ message: "supp like" });
+                        })
+                        .catch((error) => res.status(400).json({ error }));
+                } else if (thing.usersDisliked.includes(req.body.userId)) {
+                    Thing.updateOne(
+                        { _id: req.params.id },
+                        {
+                            $pull: { usersDisliked: req.body.userId },
+                            $inc: { dislikes: -1 },
+                        }
+                    )
+                        .then((thing) => {
+                            res.status(200).json({ message: "supp dislike" });
+                        })
+                        .catch((error) => res.status(400).json({ error }));
+                }
+            })
+            .catch((error) => res.status(400).json({ error }));
+    }
+};
+
