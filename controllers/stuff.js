@@ -61,7 +61,7 @@ exports.deleteThing = (req, res, next) => {
 
     Thing.findOne({ _id: req.params.id })
         .then(thing => {
-            if (thing.userId != req.auth.userId) {
+            if (thing.userId != req.auth.userId && thing.admin === false) {
                 res.status(401).json({ message: 'Not authorized ' });
             } else {
                 const filename = thing.imageUrl.split('/images/')[1];

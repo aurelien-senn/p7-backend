@@ -30,11 +30,14 @@ exports.login = (req, res, next) => {
             }
             bcrypt.compare(Data.password, user.password)
                 .then(valid => {
+                    console.log(user);
                     if (!valid) {
+                        console.log(user);
                         return res.status(401).json({ message: 'Paire login/mot de passe incorrecte' });
                     }
                     res.status(200).json({
                         userId: user._id,
+                        admin: user.admin,
                         token: jwt.sign(
                             { userId: user._id },
                             'RANDOM_TOKEN_SECRET',
