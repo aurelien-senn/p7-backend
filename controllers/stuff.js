@@ -1,6 +1,6 @@
 const Thing = require('../models/thing');
 const fs = require('fs');
-
+const User = require('../models/User');
 
 exports.createThing = (req, res, next) => {
 
@@ -106,25 +106,45 @@ exports.modifyThing = (req, res, next) => {
 
 exports.deleteThing = (req, res, next) => {
 
-    Thing.findOne({ _id: req.params.id })
-        .then(thing => {
-            if (thing.userId != req.auth.userId && thing.admin === false) {
-                res.status(401).json({ message: 'Not authorized ' });
-            } else {
-                const filename = thing.imageUrl.split('/images/')[1];
-                fs.unlink(`images/${filename}`, () => {
-                    Thing.deleteOne({ _id: req.params.id })
-                        .then(() => { res.status(200).json({ message: 'Objet supprimé !' }) })
-                        .catch(error => res.status(401).json({ error }));
+    User.findOne({ _id: req.auth.userId })
+        .then(user => {
+
+
+            Thing.findOne({ _id: req.params.id })
+                .then(thing => {
+
+                    if (thing.userId == req.auth.userId || user.admin == true) {
+                        if ((typeof thing.imageUrl) !== 'undefined') {
+                            console.log(typeof thing.imageUrl);
+                            const filename = thing.imageUrl.split('/images/')[1];
+
+                            fs.unlink(`images/${filename}`, () => {
+                                Thing.deleteOne({ _id: req.params.id })
+                                    .then(() => { res.status(200).json({ message: 'Objet supprimé !' }) })
+                                    .catch(error => res.status(401).json({ error }));
+                            });
+                        } else {
+                            Thing.deleteOne({ _id: req.params.id })
+                                .then(() => { res.status(200).json({ message: 'Objet supprimé !' }) })
+                                .catch(error => res.status(401).json({ error }));
+
+
+                        }
+                    } else {
+                        res.status(401).json({ message: 'Not authorized ' });
+
+                    }
+                })
+                .catch(error => {
+                    res.status(500).json({ error });
                 });
-            }
         })
-        .catch(error => {
-            res.status(500).json({ error });
-        });
 };
 
+
+
 exports.getAllStuff = (req, res, next) => {
+
     Thing.find().then(
         (things) => {
             res.status(200).json(things);
@@ -137,8 +157,12 @@ exports.getAllStuff = (req, res, next) => {
         }
     );
 };
+
+
+
+
 exports.likeThing = (req, res) => {
-    console.log(req.body.like);
+
     if (req.body.like === 1) {
         Thing.updateOne({ _id: req.params.id }, {
             $inc: { likes: req.body.like++ },
