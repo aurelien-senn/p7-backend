@@ -14,8 +14,7 @@ exports.createThing = (req, res, next) => {
         });
 
     } else {
-        console.log(req.body);
-        console.log(req.file.filename);
+
         var thing = new Thing({
             ...req.body,
             userId: req.auth.userId,
