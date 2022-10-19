@@ -24,8 +24,7 @@ exports.signup = (req, res, next) => {
                     imageUrl: "http://localhost:3000/images/image.png",
 
                 });
-                console.log('sans image');
-                console.log(user);
+
                 user.save()
                     .then(() => res.status(201).json({ message: 'utilisateur créé !' }))
                     .catch(error => res.status(400).json({ error }));
@@ -47,8 +46,7 @@ exports.signup = (req, res, next) => {
                     prenom: Data.prenom,
                     imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
                 });
-                console.log('avec image');
-                console.log(user);
+
                 user.save()
                     .then(() => res.status(201).json({ message: 'utilisateur créé !' }))
                     .catch(error => res.status(400).json({ error }));
@@ -81,9 +79,6 @@ exports.login = (req, res, next) => {
                     res.status(200).json({
                         userId: user._id,
                         admin: user.admin,
-                        prenom: user.prenom,
-                        nom: user.nom,
-                        imageUrl: user.imageUrl,
                         token: jwt.sign(
                             { userId: user._id },
                             'RANDOM_TOKEN_SECRET',
