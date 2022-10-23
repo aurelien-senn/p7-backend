@@ -5,15 +5,8 @@ const fs = require('fs');
 
 //creation new user
 exports.signup = (req, res, next) => {
-
-    const Data = req.body;
-
-
+    const Data = JSON.parse(req.body.data);
     if (typeof req.file == 'undefined') {
-
-
-
-
         bcrypt.hash(Data.password, 10)
             .then(hash => {
                 var user = new User({
@@ -22,21 +15,13 @@ exports.signup = (req, res, next) => {
                     nom: Data.nom,
                     prenom: Data.prenom,
                     imageUrl: "http://localhost:3000/images/image.png",
-
                 });
-
                 user.save()
                     .then(() => res.status(201).json({ message: 'utilisateur créé !' }))
                     .catch(error => res.status(400).json({ error }));
-
             })
             .catch(error => res.status(500).json({ error }));
-
-
     } else {
-
-
-
         bcrypt.hash(Data.password, 10)
             .then(hash => {
                 var user = new User({
@@ -46,7 +31,6 @@ exports.signup = (req, res, next) => {
                     prenom: Data.prenom,
                     imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
                 });
-
                 user.save()
                     .then(() => res.status(201).json({ message: 'utilisateur créé !' }))
                     .catch(error => res.status(400).json({ error }));
@@ -63,7 +47,7 @@ exports.signup = (req, res, next) => {
 
 exports.login = (req, res, next) => {
     const Data = JSON.parse(req.body.data);
-    console.log(req.body.data);
+
     User.findOne({ email: Data.email })
         .then(user => {
             if (!user) {
@@ -90,3 +74,20 @@ exports.login = (req, res, next) => {
         })
         .catch(error => res.status(500).json({ error }));
 };
+// exports.navbar = (req, res, next) => {
+//     console.log(req.auth.userId);
+
+//     User.findOne({ _id: req.auth.userId })
+//         .then(user => {
+//             console.log(user);
+//             res.status(200).json({
+//                 userId: user._id,
+//                 nom: user.nom,
+//                 prenom: user.prenom,
+//                 imageUrl: user.imageUrl
+
+//             })
+//         })
+//         .catch(error => res.status(500).json({ error }));
+// }
+
