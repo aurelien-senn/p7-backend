@@ -9,6 +9,10 @@ const thingSchema = mongoose.Schema({
     usersLiked: { type: Array, default: [], required: true },
     dislikes: { type: Number, default: 0, required: true },
     usersDisliked: { type: Array, default: [], required: true },
+    nom: { type: String },
+    prenom: { type: String },
+    imageUrlUser: { type: String },
+    date: { type: Number },
 });
 
 module.exports = mongoose.model('Thing', thingSchema);

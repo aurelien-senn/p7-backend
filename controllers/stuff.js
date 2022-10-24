@@ -1,39 +1,54 @@
 const Thing = require('../models/thing');
 const fs = require('fs');
 const User = require('../models/User');
+const { findOne } = require('../models/thing');
 
 exports.createThing = (req, res, next) => {
 
+    User.findOne({ _id: req.auth.userId })
+        .then(user => {
+
+            if (typeof req.file == 'undefined') {
+                var thing = new Thing({
+                    ...req.body,
+                    userId: req.auth.userId,
+                    date: Date.now(),
+                    nom: user.nom,
+                    prenom: user.prenom,
+                    imageUrlUser: user.imageUrl,
+
+                });
+
+            } else {
+
+                var thing = new Thing({
+                    ...req.body,
+                    userId: req.auth.userId,
+                    imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+                    date: Date.now(),
+                    nom: user.nom,
+                    prenom: user.prenom,
+                    imageUrlUser: user.imageUrl,
+
+                });
+            }
 
 
-    if (typeof req.file == 'undefined') {
-        var thing = new Thing({
-            ...req.body,
-            userId: req.auth.userId,
-
-        });
-
-    } else {
-
-        var thing = new Thing({
-            ...req.body,
-            userId: req.auth.userId,
-            imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
-
-        });
-    }
-
-
-    thing.save()
-        .then(() => { res.status(201).json({ message: 'Objet enregistré !' }) })
-        .catch(error => { res.status(400).json({ error }) })
+            thing.save()
+                .then(() => { res.status(201).json({ message: 'Objet enregistré !' }) })
+                .catch(error => { res.status(400).json({ error }) })
+        })
 };
+
 
 exports.getOneThing = (req, res, next) => {
     Thing.findOne({
         _id: req.params.id
     }).then(
         (thing) => {
+
+
+
             res.status(200).json(thing);
         }
     ).catch(

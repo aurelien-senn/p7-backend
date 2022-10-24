@@ -5,7 +5,7 @@ const fs = require('fs');
 
 //creation new user
 exports.signup = (req, res, next) => {
-    const Data = JSON.parse(req.body.data);
+    const Data = req.body.data;
     if (typeof req.file == 'undefined') {
         bcrypt.hash(Data.password, 10)
             .then(hash => {
@@ -74,20 +74,21 @@ exports.login = (req, res, next) => {
         })
         .catch(error => res.status(500).json({ error }));
 };
-// exports.navbar = (req, res, next) => {
-//     console.log(req.auth.userId);
+exports.navbar = (req, res, next) => {
 
-//     User.findOne({ _id: req.auth.userId })
-//         .then(user => {
-//             console.log(user);
-//             res.status(200).json({
-//                 userId: user._id,
-//                 nom: user.nom,
-//                 prenom: user.prenom,
-//                 imageUrl: user.imageUrl
 
-//             })
-//         })
-//         .catch(error => res.status(500).json({ error }));
-// }
+
+    User.findOne({ _id: req.auth.userId })
+        .then(user => {
+
+            res.status(200).json({
+                userId: user._id,
+                nom: user.nom,
+                prenom: user.prenom,
+                imageUrl: user.imageUrl
+
+            })
+        })
+        .catch(error => res.status(501).json({ error }));
+}
 
